@@ -1,0 +1,54 @@
+# Nombre que verás en la pestaña "Actions" de tu repositorio
+name: CI/CD Hola Mundo
+
+# TRIGGER: ¿cuándo se ejecuta este pipeline?
+# Cada vez que haces push a la rama main
+on:
+  push:
+    branches: [main]
+
+# Permisos que GitHub Pages necesita para publicar tu sitio
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # =========================================================
+  # CI: INTEGRACIÓN CONTINUA -> "¿mi código está bien?"
+  # =========================================================
+  ci:
+    # RUNNER: una máquina Linux temporal que GitHub te presta
+    runs-on: ubuntu-latest
+    steps:
+      # Paso 1: descarga tu código dentro del runner
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      # Paso 2: el TEST. grep busca el texto en el archivo.
+      # Si no lo encuentra, el comando falla, el job se pone en rojo
+      # y el pipeline se detiene aquí. Nada se publica.
+      - name: Test - la página debe decir "Hola Mundo"
+        run: grep -q "Hola Mundo" index.html
+
+      # Paso 3: empaqueta el sitio (el ARTEFACTO que recibirá CD)
+      - name: Empaquetar el sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  # =========================================================
+  # CD: DESPLIEGUE CONTINUO -> "publícalo para el mundo"
+  # =========================================================
+  cd:
+    # needs: este job SOLO corre si "ci" terminó en verde
+    needs: ci
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      # Toma el artefacto que armó CI y lo publica en GitHub Pages
+      - name: Publicar en GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
