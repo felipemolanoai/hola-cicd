@@ -3,10 +3,301 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Un pequeño Hola Mundo, un pipeline completo. De un git push a una página publicada con GitHub Actions y GitHub Pages.">
+  <meta name="theme-color" content="#101511">
   <title>Hola Mundo CI/CD</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101511;
+      --surface: #19201a;
+      --text: #f0f1e8;
+      --muted: #a5aea3;
+      --accent: #c3f480;
+      --line: #303a2e;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 850px;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 85% 35%, #81af4b0b, transparent 55%);
+    }
+    a { color: inherit; }
+    a, summary { -webkit-tap-highlight-color: transparent; }
+    a:focus-visible, summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 7px;
+      border-radius: 3px;
+    }
+    ::selection { background: var(--accent); color: var(--bg); }
+    .wrap { width: min(1160px, calc(100% - 96px)); margin-inline: auto; }
+    .skip-link {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+      padding: 12px 18px;
+      background: var(--accent);
+      color: var(--bg);
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+    header {
+      min-height: 105px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .brand-mark {
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 9px;
+      font: 700 17px var(--mono);
+    }
+    .brand-name { font-size: 19px; font-weight: 650; letter-spacing: -.7px; }
+    .brand-name span { color: var(--muted); font-weight: 400; }
+    .header-note { color: var(--muted); font: 11px var(--mono); letter-spacing: 1.3px; }
+    .header-note::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 10px; border-radius: 50%; background: var(--accent); }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      align-items: center;
+      gap: 48px;
+      padding-block: 88px 86px;
+    }
+    .eyebrow { margin: 0 0 25px; color: var(--accent); font: 11px/1.7 var(--mono); letter-spacing: 2px; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(76px, 8.5vw, 112px); font-weight: 650; line-height: .98; letter-spacing: -7px; }
+    h1 span { display: block; }
+    h1 em { color: var(--accent); font-style: normal; }
+    .intro { max-width: 390px; margin: 28px 0 0; color: var(--muted); font-size: 17px; line-height: 1.8; }
+    .hero-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      margin-top: 32px;
+      padding: 15px 19px;
+      background: var(--accent);
+      color: var(--bg);
+      border: 1px solid var(--accent);
+      border-radius: 7px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 650;
+      transition: background .2s, transform .2s;
+    }
+    .hero-link:hover { background: #d4ffa0; transform: translateY(-2px); }
+    .hero-link svg { width: 17px; height: 17px; }
+    .hero-caption { margin: 17px 0 0; color: var(--muted); font: 10px/1.7 var(--mono); }
+    .visual { position: relative; min-width: 0; }
+    .visual::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 70px;
+      background-image: radial-gradient(#4b5845 1px, transparent 1px);
+      background-size: 21px 21px;
+      opacity: .3;
+      mask-image: radial-gradient(ellipse, black 30%, transparent 70%);
+    }
+    .diagram { display: block; position: relative; width: 100%; height: auto; overflow: visible; }
+    .orbit { transform-origin: 240px 180px; animation: orbit 65s linear infinite; }
+    .terminal {
+      position: relative;
+      width: 92%;
+      margin: -10px auto 0;
+      overflow: hidden;
+      background: #171e18;
+      border: 1px solid #394532;
+      border-radius: 12px;
+      box-shadow: 0 22px 60px #0003;
+      transform: rotate(-2deg);
+    }
+    .terminal-bar { display: flex; align-items: center; gap: 6px; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+    .terminal-bar i { width: 7px; height: 7px; border-radius: 50%; background: #5b6854; }
+    .terminal-bar span { margin-left: auto; color: var(--muted); font: 10px var(--mono); }
+    .terminal-body { padding: 21px 22px 23px; font: 12px/1.8 var(--mono); }
+    .command { margin: 0 0 14px; color: var(--text); }
+    .command span { margin-right: 10px; color: var(--accent); }
+    .terminal-result { margin: 0; color: var(--muted); font-size: 11px; }
+    .terminal-result b { color: var(--accent); font-weight: 400; }
+    .process { padding-block: 36px 54px; border-top: 1px solid var(--line); }
+    .section-top { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 32px; }
+    .section-top h2 { margin: 0; font-size: 20px; font-weight: 500; letter-spacing: -.5px; }
+    .section-top p { margin: 0; color: var(--muted); font: 10px var(--mono); letter-spacing: 1px; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .step { padding: 22px 0 0; border-top: 1px solid var(--line); }
+    summary { list-style: none; cursor: pointer; }
+    summary::-webkit-details-marker { display: none; }
+    .step-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .step-number { color: var(--accent); font: 11px var(--mono); }
+    .step-toggle { color: var(--muted); font: 17px var(--mono); transition: transform .2s; }
+    details[open] .step-toggle { transform: rotate(45deg); }
+    summary:hover .step-toggle { color: var(--accent); }
+    .step-title { display: block; margin: 19px 0 9px; font-size: 18px; font-weight: 500; letter-spacing: -.3px; }
+    .step-description { display: block; max-width: 300px; color: var(--muted); font-size: 13px; line-height: 1.75; }
+    .step-detail { margin-top: 18px; padding: 14px; border-left: 2px solid var(--accent); background: var(--surface); color: #c4cdc0; font-size: 12px; line-height: 1.8; }
+    .step-detail p { margin: 0; }
+    code { font: .92em var(--mono); overflow-wrap: anywhere; }
+    footer { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-block: 24px 30px; border-top: 1px solid var(--line); color: var(--muted); font: 10px/1.7 var(--mono); }
+    footer p { margin: 0; }
+    .footer-right { display: flex; align-items: center; gap: 8px; }
+    .footer-right svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--accent); }
+    .hero-copy { animation: arrive .7s ease-out both; }
+    .visual { animation: arrive .9s .1s ease-out both; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+
+    @media (min-width: 1500px) { .hero { padding-block: 112px; } }
+    @media (max-width: 900px) {
+      .wrap { width: calc(100% - 56px); }
+      .hero { gap: 20px; padding-block: 70px; }
+      h1 { font-size: 80px; letter-spacing: -5px; }
+      .intro { font-size: 15px; }
+      .terminal { width: 100%; }
+      .terminal-body { padding: 16px; font-size: 11px; }
+      .terminal-result { font-size: 10px; }
+    }
+    @media (max-width: 650px) {
+      .wrap { width: calc(100% - 40px); }
+      header { min-height: 80px; gap: 12px; }
+      .header-note { font-size: 9px; letter-spacing: .5px; }
+      .brand-name { font-size: 17px; }
+      .hero { grid-template-columns: 1fr; gap: 28px; padding-block: 52px 48px; }
+      h1 { font-size: clamp(74px, 17vw, 104px); }
+      .intro { max-width: 350px; }
+      .visual { width: min(100%, 420px); margin-inline: auto; }
+      .terminal { width: 92%; }
+      .section-top { align-items: start; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+      .steps { grid-template-columns: 1fr; gap: 26px; }
+      .step-description { max-width: none; }
+      .step-title { margin-top: 12px; }
+      .process { padding-bottom: 38px; }
+      footer { align-items: start; flex-direction: column; gap: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Hola Mundo</h1>
-  <p>Esta página fue probada y publicada automáticamente por mi pipeline de CI/CD.</p>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="#contenido" aria-label="Hola CI/CD, inicio">
+        <span class="brand-mark" aria-hidden="true">&gt;_</span>
+        <span class="brand-name">hola<span>.cicd</span></span>
+      </a>
+      <span class="header-note">UN EXPERIMENTO EN LA WEB</span>
+    </header>
+
+    <main id="contenido">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Pequeño código. Grandes comienzos.</p>
+          <h1 id="hero-title">Hola <span>Mundo<em aria-hidden="true">_</em></span></h1>
+          <p class="intro">Esta página fue probada y publicada automáticamente por mi pipeline de CI/CD.</p>
+          <a class="hero-link" href="#proceso">
+            Descubre cómo funciona
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </a>
+          <p class="hero-caption">Un git push. El resto, en automático.</p>
+        </div>
+
+        <div class="visual">
+          <svg class="diagram" viewBox="0 0 480 350" fill="none" role="img" aria-labelledby="diagram-title diagram-description">
+            <title id="diagram-title">Del código a la web</title>
+            <desc id="diagram-description">Un globo conectado con un símbolo de código representa la publicación de la página mediante CI/CD.</desc>
+            <defs>
+              <radialGradient id="globe-fill"><stop stop-color="#263722"/><stop offset="1" stop-color="#152015"/></radialGradient>
+              <linearGradient id="orbit-line" x1="60" y1="70" x2="410" y2="290" gradientUnits="userSpaceOnUse"><stop stop-color="#c3f480" stop-opacity=".7"/><stop offset="1" stop-color="#c3f480" stop-opacity=".12"/></linearGradient>
+            </defs>
+            <circle cx="240" cy="180" r="140" stroke="#303e2b" stroke-dasharray="3 9"/>
+            <circle cx="240" cy="180" r="110" fill="url(#globe-fill)" stroke="#8fa97a" stroke-width="1.2"/>
+            <ellipse cx="240" cy="180" rx="57" ry="110" stroke="#6a8655" stroke-opacity=".7"/>
+            <ellipse cx="240" cy="180" rx="100" ry="47" stroke="#6a8655" stroke-opacity=".7"/>
+            <path d="M130 180h220M240 70v220M149 118c50 29 132 29 182 0M149 242c50-29 132-29 182 0" stroke="#6a8655" stroke-opacity=".6"/>
+            <ellipse cx="240" cy="180" rx="194" ry="65" transform="rotate(-28 240 180)" stroke="url(#orbit-line)" stroke-width="1.2"/>
+            <g class="orbit"><circle cx="77" cy="274" r="5" fill="#c3f480"/><circle cx="77" cy="274" r="11" stroke="#c3f480" stroke-opacity=".2"/></g>
+            <g transform="translate(69 74) rotate(-8 29 29)">
+              <rect width="58" height="58" rx="15" fill="#202e1d" stroke="#6c8d52"/>
+              <path d="m22 20-9 9 9 9m14-18 9 9-9 9m-5-21-5 24" stroke="#c3f480" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <g transform="translate(342 221) rotate(8 29 29)">
+              <rect width="58" height="58" rx="15" fill="#c3f480"/>
+              <path d="m18 29 8 8 15-17" stroke="#22351a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <path d="M361 83v12m-6-6h12M106 223v8m-4-4h8" stroke="#9fb786" stroke-linecap="round"/>
+            <circle cx="377" cy="150" r="2" fill="#9fb786"/>
+            <circle cx="163" cy="310" r="2" fill="#9fb786"/>
+          </svg>
+          <div class="terminal" aria-label="Ejemplo del comando que inicia el pipeline">
+            <div class="terminal-bar"><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i><span>terminal — main</span></div>
+            <div class="terminal-body">
+              <p class="command"><span aria-hidden="true">❯</span><code>git push origin main</code></p>
+              <p class="terminal-result"><b>↳</b> Tu código inicia el viaje hacia la web.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="process" id="proceso" aria-labelledby="process-title">
+        <div class="section-top">
+          <h2 id="process-title">Del código al mundo.</h2>
+          <p>TRES PASOS. UN SOLO PUSH.</p>
+        </div>
+        <div class="steps">
+          <details class="step">
+            <summary>
+              <span class="step-head"><span class="step-number">01 / CÓDIGO</span><span class="step-toggle" aria-hidden="true">+</span></span>
+              <span class="step-title">Todo empieza con un cambio.</span>
+              <span class="step-description">Escribes, guardas y haces push a main. GitHub Actions toma el relevo.</span>
+            </summary>
+            <div class="step-detail"><p>El workflow se activa con cada push a la rama <code>main</code>. Primero descarga el código del repositorio en una máquina temporal.</p></div>
+          </details>
+          <details class="step">
+            <summary>
+              <span class="step-head"><span class="step-number">02 / INTEGRACIÓN</span><span class="step-toggle" aria-hidden="true">+</span></span>
+              <span class="step-title">Una comprobación antes de salir.</span>
+              <span class="step-description">El pipeline verifica el contenido y empaqueta la página para publicarla.</span>
+            </summary>
+            <div class="step-detail"><p>La prueba busca el texto <code>Hola Mundo</code> en <code>index.html</code>. Si lo encuentra, prepara el artefacto del sitio. Si falla, el proceso se detiene.</p></div>
+          </details>
+          <details class="step">
+            <summary>
+              <span class="step-head"><span class="step-number">03 / DESPLIEGUE</span><span class="step-toggle" aria-hidden="true">+</span></span>
+              <span class="step-title">Y entonces, hola mundo.</span>
+              <span class="step-description">GitHub Pages publica el resultado. Tu idea ya tiene un lugar en internet.</span>
+            </summary>
+            <div class="step-detail"><p>El despliegue espera a que la integración termine correctamente. Después, publica el artefacto en GitHub Pages de forma automática.</p></div>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Hecho para aprender. Publicado para compartir.</p>
+      <p class="footer-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m8 5-7 7 7 7m8-14 7 7-7 7M14 3l-4 18"/></svg>HTML + GitHub Actions + GitHub Pages</p>
+    </footer>
+  </div>
 </body>
 </html>
